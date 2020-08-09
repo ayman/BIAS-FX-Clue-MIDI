@@ -119,7 +119,7 @@ screen.append(FOOTER_BOX)
 # cc x num
 CC_X_NUM_LABEL = label.Label(terminalio.FONT,
                              # text=("CC {}".format(CC_X_NUM)),
-                             text=("Waiting"),
+                             text=(" "),
                              scale=3,
                              color=ORANGE,
                              max_glyphs=6)
@@ -159,7 +159,7 @@ screen.append(CC_Y_NUM_LABEL)
 
 # cc y value text
 CC_Y_LABEL = label.Label(terminalio.FONT,
-                         text=(" "),
+                         text=("BLE"),
                          scale=3,
                          color=BLUE,
                          max_glyphs=3)
@@ -174,7 +174,7 @@ screen.append(MID_LINE_B)
 # cc prox num text
 CC_PROX_NUM_LABEL = label.Label(terminalio.FONT,
                                 # text=("CC {}".format(CC_PROX_NUM)),
-                                text=("BLE"),
+                                text=(" "),
                                 scale=3,
                                 color=SILVER,
                                 max_glyphs=6)
@@ -205,7 +205,7 @@ TITLE_LABEL.background_color = DARK_GREEN
 screen.append(TITLE_LABEL)
 
 PATCH_LABEL = label.Label(terminalio.FONT,
-                          text="hi!",
+                          text="wating",
                           scale=2,
                           color=BLUE,
                           max_glyphs=12)
@@ -233,8 +233,23 @@ cc_send_toggle = True  # to start and stop sending cc
 
 PRESET_LETTERS = ["A", "B", "C", "D"]
 
+
+def initScreen():
+    PICKER_BOX.y = -10
+    # FOOTER_LABEL.x = 110
+    TITLE_LABEL.text = "BiasFX2 MIDI"
+    CC_X_NUM_LABEL.text = " "
+    CC_X_LABEL.text = " "
+    CC_Y_NUM_LABEL.text = "Connect"
+    CC_Y_LABEL.text = "BLE"
+    CC_PROX_NUM_LABEL.text = " "
+    CC_PROX_LABEL.text = " "
+    PATCH_LABEL.text = "waiting"
+    FOOTER_LABEL.text = " shamur.ai"
+
+
 def doProgramChange(preset):
-    MIDI.send(ProgramChange(preset + (PATCH_HOME * 4)))    
+    MIDI.send(ProgramChange(preset + (PATCH_HOME * 4)))
     CC_PROX_LABEL.text = PRESET_LETTERS[preset]
     time.sleep(DEBOUNCE_TOUCH)
 
@@ -260,6 +275,7 @@ while True:
         MODE_SETTING = 1
         FOOTER_LABEL.x = 120
         FOOTER_LABEL.color = BLUE
+        PATCH_LABEL.text = "Yay..."
         FOOTER_LABEL.text = "Connected!"
         clue.white_leds = True
         clue.pixel.fill((0, 255, 0))
@@ -267,16 +283,15 @@ while True:
         clue.white_leds = False
         time.sleep(2.5)
 
-        ## Init for Mode 1
+        # Init for Mode 1
         TITLE_LABEL.text = "BiasFX2   M1"
         PATCH_LABEL.text = "Mode"
         FOOTER_LABEL.x = 120
         FOOTER_LABEL.color = SILVER
         FOOTER_LABEL.text = "        CC"
-        PICKER_BOX.y = PICKER_BOX_ROW[cc_num_pick_toggle]        
-        clue.pixel.fill((0, 0, 0))        
-        
-        
+        PICKER_BOX.y = PICKER_BOX_ROW[cc_num_pick_toggle]
+        clue.pixel.fill((0, 0, 0))
+
         while BLE.connected:
             if MODE_SETTING == 1:
                 # Clue sensor readings to CC
@@ -295,16 +310,22 @@ while True:
                 CC_Y = int(simpleio.map_range(ACCEL_Y, -6, 0, 0, 127))
 
                 CC_PROX = int(simpleio.map_range(PROX_DATA, 0, 255, 0, 127))
+                CC_PROX_SWITCH = 127 if CC_PROX > 1 else 0
 
-                # send all the midi messages in a list
+                midi_data = [ControlChange(CC_X_NUM, CC_X),
+                             ControlChange(CC_Y_NUM, CC_Y)]
+
+                if CC_PROX_SWITCH != 0:
+                    midi_data.append(ControlChange(
+                        CC_PROX_NUM, CC_PROX_SWITCH))
+
                 if cc_send_toggle:
-                    MIDI.send(
-                        [
-                            ControlChange(CC_X_NUM, CC_X),
-                            ControlChange(CC_Y_NUM, CC_Y),
-                            ControlChange(CC_PROX_NUM, CC_PROX),
-                        ]
-                    )
+                    MIDI.send(midi_data)
+
+                if CC_PROX_SWITCH != 0:
+                    # Since the PROX is a momentary switch, debounce it
+                    time.sleep(DEBOUNCE_TOUCH * 2.5)
+
                 CC_X_LABEL.x = column_b
                 CC_X_LABEL.y = row_a
                 CC_X_NUM_LABEL.text = "CC {}".format(CC_X_NUM)
@@ -317,8 +338,6 @@ while True:
 
                 CC_PROX_LABEL.x = column_b
                 CC_PROX_LABEL.y = row_c
-                # CC_PROX_NUM_LABEL.x = column_a
-                # CC_PROX_NUM_LABEL.y = row_c
                 CC_PROX_NUM_LABEL.text = "CC {}".format(CC_PROX_NUM)
                 CC_PROX_LABEL.text = CC_PROX
 
@@ -368,7 +387,7 @@ while True:
                 if clue.touch_1:
                     cc_num_pick_toggle = (cc_num_pick_toggle + 1) % 3
                     PICKER_BOX.y = PICKER_BOX_ROW[cc_num_pick_toggle]
-                    time.sleep(DEBOUNCE_TOUCH)                    
+                    time.sleep(DEBOUNCE_TOUCH)
                 if clue.touch_2:
                     MODE_SETTING = 2
                     TITLE_LABEL.text = "BiasFX2   M2"
@@ -383,6 +402,7 @@ while True:
 
                 CC_Y_LABEL.x = column_b
                 CC_Y_LABEL.y = row_b
+                CC_Y_NUM_LABEL.x = column_a - 15
                 CC_Y_NUM_LABEL.text = "< DOWN"
                 CC_Y_LABEL.text = "UP >"
 
@@ -406,7 +426,10 @@ while True:
                     TITLE_LABEL.text = "BiasFX2   M3"
                     # PATCH_LABEL.text = "Preset {}".format(PATCH_HOME + 1)
                     CC_PROX_NUM_LABEL.text = "Patch:"
-                    FOOTER_LABEL.text = "Patches"
+                    FOOTER_LABEL.text = "   Patches"
+                    CC_Y_NUM_LABEL.x = column_a                    
+                    CC_Y_NUM_LABEL.text = " "
+                    CC_Y_LABEL.text = " "                    
                     time.sleep(DEBOUNCE_TOUCH)
             elif MODE_SETTING == 3:
                 print("Mode 3")
@@ -422,12 +445,10 @@ while True:
                     MODE_SETTING = 1
                     TITLE_LABEL.text = "BiasFX2   M1"
                     FOOTER_LABEL.text = "        CC"
-                    PICKER_BOX.y = PICKER_BOX_ROW[cc_num_pick_toggle]       
+                    PICKER_BOX.y = PICKER_BOX_ROW[cc_num_pick_toggle]
                     time.sleep(DEBOUNCE_TOUCH)
         print("Disconnected")
         MODE_SETTING = 0
         print()
-        PATCH_LABEL.text = "Waiting: "
-        FOOTER_LABEL.x = 110
-        FOOTER_LABEL.text = "Connect BLE"
+        initScreen()
         BLE.start_advertising(ADVERTISEMENT)
