@@ -392,8 +392,6 @@ while True:
 
                 CC_PROX_LABEL.x = COLUMN_B
                 CC_PROX_LABEL.y = ROW_C
-                # CC_PROX_NUM_LABEL.x = COLUMN_A
-                # CC_PROX_NUM_LABEL.y = ROW_C
                 CC_PROX_NUM_LABEL.text = " "
                 CC_PROX_LABEL.text = " "
 
@@ -416,14 +414,13 @@ while True:
                     CC_Y_LABEL.text = " "
                     time.sleep(DEBOUNCE_TOUCH)
             elif MODE_SETTING == 3:
-                print("Mode 3")
-                if clue.button_a:  # or clue.gesture == 1:
+                if clue.button_a:  # or (clue.gesture == 1):
                     do_program_change(0)
-                if clue.button_b:  # or clue.gesture == 2:
+                if clue.button_b:  # or (clue.gesture == 2):
                     do_program_change(1)
-                if clue.touch_0:  # or clue.gesture == 3:
+                if clue.touch_0:  # or (clue.gesture == 3):
                     do_program_change(2)
-                if clue.touch_1:  # or clue.gesture == 4:
+                if clue.touch_1:  # or (clue.gesture == 4):
                     do_program_change(3)
                 if clue.touch_2:
                     MODE_SETTING = 1
