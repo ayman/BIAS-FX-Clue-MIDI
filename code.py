@@ -289,21 +289,23 @@ while True:
                 CC_Y = int(simpleio.map_range(ACCEL_Y, -6, 0, 0, 127))
 
                 CC_PROX = int(simpleio.map_range(PROX_DATA, 0, 255, 0, 127))
-                CC_PROX_SWITCH = 127 if CC_PROX > 1 else 0
+                CC_PROX_SWITCH = 127 if CC_PROX > 4 else 0
 
                 MIDI_DATA = [ControlChange(CC_X_NUM, CC_X),
                              ControlChange(CC_Y_NUM, CC_Y)]
 
                 if CC_PROX_SWITCH != 0:
-                    MIDI_DATA.append(ControlChange(
-                        CC_PROX_NUM, CC_PROX_SWITCH))
+                    clue.white_leds = True
+                    MIDI_DATA.append(ControlChange(CC_PROX_NUM,
+                                                   CC_PROX_SWITCH))
 
                 if CC_SEND_TOGGLE:
                     MIDI.send(MIDI_DATA)
 
                 if CC_PROX_SWITCH != 0:
                     # Since the PROX is a momentary switch, debounce it
-                    time.sleep(DEBOUNCE_TOUCH * 2.5)
+                    time.sleep(DEBOUNCE_TOUCH * 1.5)
+                    clue.white_leds = False
 
                 CC_X_LABEL.x = COLUMN_B
                 CC_X_LABEL.y = ROW_A
