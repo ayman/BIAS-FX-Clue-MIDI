@@ -37,10 +37,10 @@ Toggles within the current bank
 ## What you'll need:
  * [Adafruit CLUE - nRF52840 Express with Bluetooth
    LE](https://www.adafruit.com/product/4500)
- * Battery (go rechargable! pick one)
-   * Super Tiny[Lithium Ion Polymer Battery - 3.7v
+ * Battery Go rechargable! pick one...both work and I used both for over an hour.
+   * Super Tiny: [Lithium Ion Polymer Battery - 3.7v
      100mAh](https://www.adafruit.com/product/1570)
-   * Tiny [Lithium Ion Polymer Battery with Short Cable - 3.7V
+   * Tiny: [Lithium Ion Polymer Battery with Short Cable - 3.7V
      350mAh](https://www.adafruit.com/product/4237)
  * Charger (pick one)
    * [MicroUSB](https://www.adafruit.com/product/1904)
