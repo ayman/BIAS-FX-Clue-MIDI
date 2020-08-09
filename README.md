@@ -9,13 +9,19 @@ Touch button 3 toggles modes.
 
 ### Mode 1: CC Program (Default)
 This mode lets you select CC modes and change the default CC numbers: 71, 72, 73. 
+ * Physical Button 1: Decrease Selected CC Number
+ * Physical Button 2: Increase Selected CC Number
+ * Touch Button 1: Pause CC Messages 
+ * Touch Button 2: Move selector
 
 ### Mode 2 Bank Switch
-Physical Button 1: Bank Up
-Physical Button 2: Bank Down
+Just make sure you have a real bank selected.
+ * Physical Button 1: Bank Down
+ * Physical Button 2: Bank Up
 
 ### Mode 3 Toggle Presets
-Physical Button 1: Preset 1
-Physical Button 2: Preset 2
-Touch Button 1: Preset 3
-Touch Button 2: Preset 4
+Toggles within the current bank
+ * Physical Button 1: Preset 1
+ * Physical Button 2: Preset 2
+ * Touch Button 1: Preset 3
+ * Touch Button 2: Preset 4
