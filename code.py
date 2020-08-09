@@ -29,6 +29,7 @@ CC_X_NUM = 71
 CC_Y_NUM = 72
 CC_PROX_NUM = 73
 PATCH_HOME = 0
+PATCH_PRESET = 0
 PRESET_LETTERS = ["A", "B", "C", "D"]
 PATCH_COUNT = 10
 
@@ -229,9 +230,11 @@ def init_screen():
 def do_program_change(preset):
     """Execute a program change and update the screen.
     """
+    global PATCH_PRESET
+    PATCH_PRESET = preset
     MIDI.send(ProgramChange(preset + (PATCH_HOME * 4)))
     CC_PROX_LABEL.text = PRESET_LETTERS[preset]
-    time.sleep(DEBOUNCE_TOUCH)
+    time.sleep(DEBOUNCE_TIME)
 
 
 # set debug mode True to test raw values, set False to run BLE MIDI
@@ -414,13 +417,13 @@ while True:
                     time.sleep(DEBOUNCE_TOUCH)
             elif MODE_SETTING == 3:
                 print("Mode 3")
-                if clue.button_a:
+                if clue.button_a:  # or clue.gesture == 1:
                     do_program_change(0)
-                if clue.button_b:
+                if clue.button_b:  # or clue.gesture == 2:
                     do_program_change(1)
-                if clue.touch_0:
+                if clue.touch_0:  # or clue.gesture == 3:
                     do_program_change(2)
-                if clue.touch_1:
+                if clue.touch_1:  # or clue.gesture == 4:
                     do_program_change(3)
                 if clue.touch_2:
                     MODE_SETTING = 1
