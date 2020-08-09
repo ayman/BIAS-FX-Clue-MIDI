@@ -1,4 +1,5 @@
 # BIAS-FX-Clue-Midi
+
 Modification of [MIDI CLUE BLE Glove](https://bit.ly/2PBzcX9) for BIAS
 FX2.  Lets you do crazy things like
 * Use your foot as an expression pedal
@@ -10,6 +11,7 @@ FX2.  Lets you do crazy things like
 Touch button 3 toggles modes. 
 
 ### Mode 1: CC Program (Default)
+
 This mode lets you select CC modes and change the default CC numbers:
 71, 72, 73.  X value is returned on the first (tilt left and right)
 value, Y value from 0° to 70° is the default (opposite of an
@@ -21,6 +23,7 @@ works as a momentary switch.
  * Touch Button 2: Move cursor
 
 ### Mode 2 Bank Switch
+
 Doesn't actually move your bank up and down but sets the bank
 number...so you'll need some clairvoyance; Just make sure you have a
 real bank selected.
@@ -28,6 +31,7 @@ real bank selected.
  * Physical Button 2: Bank Up
 
 ### Mode 3 Toggle Presets
+
 Toggles within the current bank
  * Physical Button 1: Preset 1
  * Physical Button 2: Preset 2
@@ -35,7 +39,8 @@ Toggles within the current bank
  * Touch Button 2: Preset 4
 
 ## What you'll need:
- * [Adafruit CLUE - nRF52840 Express with Bluetooth
+
+* [Adafruit CLUE - nRF52840 Express with Bluetooth
    LE](https://www.adafruit.com/product/4500)
  * Battery Go rechargable! pick one...both work and I used both for over an hour.
    * Super Tiny: [Lithium Ion Polymer Battery - 3.7v
@@ -49,4 +54,6 @@ Toggles within the current bank
    computer...if you don't go get it.
  
  ## Tutorial 
- Adafruit has this tutorial on the [CLUE BLE MIDI Glove](https://learn.adafruit.com/clue-midi-glove), do that first.
+
+Adafruit has this tutorial on the [CLUE BLE MIDI
+Glove](https://learn.adafruit.com/clue-midi-glove), do that first.
