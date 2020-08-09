@@ -1,6 +1,9 @@
 # BIAS-FX-Clue-Midi
 Modification of [MIDI CLUE BLE Glove](https://bit.ly/2PBzcX9) for BIAS
-FX2.
+FX2.  Lets you do crazy things like
+* Use your foot as an expression pedal
+* Use proximity as a momentary switch
+* Switch banks and presets
 
 ## Operation
 
