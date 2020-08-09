@@ -48,5 +48,5 @@ Toggles within the current bank
  * Cable: I assume you have a cable that goes MicroUSB into your
    computer...if you don't go get it.
  
- ## Tutorial Adafruit has this tutorial on the [CLUE BLE MIDI
- Glove](https://learn.adafruit.com/clue-midi-glove), do that first.
+ ## Tutorial 
+ Adafruit has this tutorial on the [CLUE BLE MIDI Glove](https://learn.adafruit.com/clue-midi-glove), do that first.
