@@ -26,7 +26,8 @@ works as a momentary switch.
 
 Doesn't actually move your bank up and down but sets the bank
 number...so you'll need some clairvoyance; Just make sure you have a
-real bank selected.
+real bank selected.  There are [8 banks of 4](https://bit.ly/3gK57kb)
+to choose from.
  * Physical Button 1: Bank Down
  * Physical Button 2: Bank Up
 
@@ -53,7 +54,8 @@ Toggles within the current bank
  * Cable: I assume you have a cable that goes MicroUSB into your
    computer...if you don't go get it.
  
- ## Tutorial 
+ ## Glove Tutorial 
 
 Adafruit has this tutorial on the [CLUE BLE MIDI
 Glove](https://learn.adafruit.com/clue-midi-glove), do that first.
+This code was derived from that project.

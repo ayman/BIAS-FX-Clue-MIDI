@@ -31,7 +31,7 @@ CC_PROX_NUM = 73
 PATCH_HOME = 0
 PATCH_PRESET = 0
 PRESET_LETTERS = ["A", "B", "C", "D"]
-PATCH_COUNT = 10
+PATCH_COUNT = 7
 
 CC_X = 0
 CC_Y = 0
@@ -278,9 +278,9 @@ while True:
             if MODE_SETTING == 1:
                 # Clue sensor readings to CC
                 ACCEL_DATA = clue.acceleration  # get accelerometer reading
+                PROX_DATA = clue.proximity
                 ACCEL_X = ACCEL_DATA[0]
                 ACCEL_Y = ACCEL_DATA[1]
-                PROX_DATA = clue.proximity
 
                 # Remap analog readings to cc range
                 CC_X = int(simpleio.map_range(ACCEL_X, -9, 9, 0, 127))
@@ -412,7 +412,7 @@ while True:
                     CC_Y_NUM_LABEL.x = COLUMN_A
                     CC_Y_NUM_LABEL.text = " "
                     CC_Y_LABEL.text = " "
-                    time.sleep(DEBOUNCE_TOUCH)
+                    time.sleep(DEBOUNCE_TOUCH)                    
             elif MODE_SETTING == 3:
                 if clue.button_a:  # or (clue.gesture == 1):
                     do_program_change(0)
