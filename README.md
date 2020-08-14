@@ -46,7 +46,10 @@ Toggles within the current bank
  * Battery Go rechargable! pick one...both work and I used both for over an hour.
    * Super Tiny: [Lithium Ion Polymer Battery - 3.7v
      100mAh](https://www.adafruit.com/product/1570)
-   * Tiny: [Lithium Ion Polymer Battery with Short Cable - 3.7V
+   * Tiny (+ more juice): 
+     * [Lithium Ion Polymer Battery Ideal For Feathers - 3.7V
+       400mAh](https://www.adafruit.com/product/3898)
+     * [Lithium Ion Polymer Battery with Short Cable - 3.7V
      350mAh](https://www.adafruit.com/product/4237)
  * Charger (pick one)
    * [MicroUSB](https://www.adafruit.com/product/1904)
@@ -58,4 +61,5 @@ Toggles within the current bank
 
 Adafruit has this tutorial on the [CLUE BLE MIDI
 Glove](https://learn.adafruit.com/clue-midi-glove), do that first.
-This code was derived from that project.
+This code was derived from that project and the [API
+docs](https://circuitpython.readthedocs.io/projects/clue/en/latest/api.html).

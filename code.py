@@ -236,36 +236,17 @@ def do_program_change(preset):
     CC_PROX_LABEL.text = PRESET_LETTERS[preset]
     time.sleep(DEBOUNCE_TIME)
 
+def debug_loop():
+    ACCEL_DATA = clue.acceleration  # get accelerometer reading
+    ACCEL_X = ACCEL_DATA[0]
+    ACCEL_Y = ACCEL_DATA[1]
+    PROX_DATA = clue.proximity
+    print("x:{} y:{}".format(ACCEL_X, ACCEL_Y,))
+    print("proximity: {}".format(clue.proximity))
+    time.sleep(0.2)
 
-# set debug mode True to test raw values, set False to run BLE MIDI
-DEBUG = False
-while True:
-    if DEBUG:
-        ACCEL_DATA = clue.acceleration  # get accelerometer reading
-        ACCEL_X = ACCEL_DATA[0]
-        ACCEL_Y = ACCEL_DATA[1]
-        PROX_DATA = clue.proximity
-        print("x:{} y:{}".format(ACCEL_X, ACCEL_Y,))
-        print("proximity: {}".format(clue.proximity))
-        time.sleep(0.2)
-    else:
-        print("Waiting for connection")
-        clue.pixel.fill((255, 165, 0))
-        while not BLE.connected:
-            pass
-        print("Connected")
-        MODE_SETTING = 1
-        FOOTER_LABEL.x = 120
-        FOOTER_LABEL.color = COLORS["BLUE"]
-        PATCH_LABEL.text = "Yay..."
-        FOOTER_LABEL.text = "Connected!"
-        clue.white_leds = True
-        clue.pixel.fill((0, 255, 0))
-        time.sleep(0.5)
-        clue.white_leds = False
-        time.sleep(2.5)
-
-        # Init for Mode 1
+def init_mode(mode):
+    if mode == 1:
         TITLE_LABEL.text = "BiasFX2   M1"
         PATCH_LABEL.text = "Mode"
         FOOTER_LABEL.x = 120
@@ -273,7 +254,69 @@ while True:
         FOOTER_LABEL.text = "        CC"
         PICKER_BOX.y = PICKER_BOX_ROW[CC_NUM_PICK_TOGGLE]
         clue.pixel.fill((0, 0, 0))
+    elif mode == 2:
+        TITLE_LABEL.text = "BiasFX2   M2"
+        PICKER_BOX.y = -10
+        FOOTER_LABEL.text = "     Banks"
 
+        CC_X_NUM_LABEL.text = "Bank:"
+        CC_X_LABEL.text = PATCH_HOME + 1
+
+        CC_Y_LABEL.x = COLUMN_B
+        CC_Y_LABEL.y = ROW_B
+        CC_Y_NUM_LABEL.x = COLUMN_A - 15
+        CC_Y_NUM_LABEL.text = "< DOWN"
+        CC_Y_LABEL.text = "UP >"
+        
+        CC_PROX_LABEL.x = COLUMN_B
+        CC_PROX_LABEL.y = ROW_C
+        CC_PROX_NUM_LABEL.text = " "
+        CC_PROX_LABEL.text = " "        
+    elif mode == 3:
+        TITLE_LABEL.text = "BiasFX2   M3"
+        CC_PROX_NUM_LABEL.text = "Patch:"
+        FOOTER_LABEL.text = "   Patches"
+        CC_Y_NUM_LABEL.x = COLUMN_A
+        CC_Y_NUM_LABEL.text = " "
+        CC_Y_LABEL.text = " "
+    elif mode == 0:
+        clue.pixel.fill((0, 255, 0))
+        FOOTER_LABEL.x = 120
+        FOOTER_LABEL.color = COLORS["BLUE"]
+        PATCH_LABEL.text = "Yay..."
+        FOOTER_LABEL.text = "Connected!"        
+    return mode
+
+def switch_bank(up):
+    global PATCH_HOME, PATCH_COUNT, CC_X_LABEL
+    direction = 1 if up is True else -1
+    print(PATCH_HOME)
+    print(PATCH_COUNT)
+    PATCH_HOME = (PATCH_HOME + direction) % PATCH_COUNT
+    CC_X_LABEL.text = PATCH_HOME
+    return PATCH_HOME
+        
+
+# set debug mode True to test raw values, set False to run BLE MIDI
+DEBUG = False
+
+while True:
+    if DEBUG:
+        debug_loop()
+    else:
+        print("Waiting for connection")
+        clue.pixel.fill((255, 165, 0))
+        while not BLE.connected:
+            pass
+        print("Connected")
+        # MODE_SETTING = 1
+        init_mode(0)
+        clue.white_leds = True
+        time.sleep(0.5)
+        clue.white_leds = False
+        time.sleep(1.0)        
+        MODE_SETTING = init_mode(1)
+        
         while BLE.connected:
             if MODE_SETTING == 1:
                 # Clue sensor readings to CC
@@ -285,11 +328,8 @@ while True:
                 # Remap analog readings to cc range
                 CC_X = int(simpleio.map_range(ACCEL_X, -9, 9, 0, 127))
 
-                # Remap this for an expression pedal like movement
-                # CC_Y = int(simpleio.map_range(ACCEL_Y, 0, 6, 127, 0))
-
                 # It's easier to map it inverted for a shoe mount...
-                CC_Y = int(simpleio.map_range(ACCEL_Y, -6, 0, 0, 127))
+                CC_Y = int(simpleio.map_range(ACCEL_Y, -7, 2, 0, 127))
 
                 CC_PROX = int(simpleio.map_range(PROX_DATA, 0, 255, 0, 127))
                 CC_PROX_SWITCH = 127 if CC_PROX > 4 else 0
@@ -310,18 +350,12 @@ while True:
                     time.sleep(DEBOUNCE_TOUCH * 1.5)
                     clue.white_leds = False
 
-                CC_X_LABEL.x = COLUMN_B
-                CC_X_LABEL.y = ROW_A
                 CC_X_NUM_LABEL.text = "CC {}".format(CC_X_NUM)
                 CC_X_LABEL.text = CC_X
 
-                CC_Y_LABEL.x = COLUMN_B
-                CC_Y_LABEL.y = ROW_B
                 CC_Y_NUM_LABEL.text = "CC {}".format(CC_Y_NUM)
                 CC_Y_LABEL.text = CC_Y
 
-                CC_PROX_LABEL.x = COLUMN_B
-                CC_PROX_LABEL.y = ROW_C
                 CC_PROX_NUM_LABEL.text = "CC {}".format(CC_PROX_NUM)
                 CC_PROX_LABEL.text = CC_PROX
 
@@ -373,60 +407,30 @@ while True:
                     PICKER_BOX.y = PICKER_BOX_ROW[CC_NUM_PICK_TOGGLE]
                     time.sleep(DEBOUNCE_TOUCH)
                 if clue.touch_2:
-                    MODE_SETTING = 2
-                    TITLE_LABEL.text = "BiasFX2   M2"
-                    # PATCH_LABEL.text = "Banks {}".format(PATCH_HOME)
-                    PICKER_BOX.y = -10
-                    FOOTER_LABEL.text = "     Banks"
+                    MODE_SETTING = init_mode(2)
                     time.sleep(DEBOUNCE_TOUCH)
             elif MODE_SETTING == 2:
-                print("Mode 2")
-                CC_X_NUM_LABEL.text = "Bank:"
-                CC_X_LABEL.text = PATCH_HOME + 1
-
-                CC_Y_LABEL.x = COLUMN_B
-                CC_Y_LABEL.y = ROW_B
-                CC_Y_NUM_LABEL.x = COLUMN_A - 15
-                CC_Y_NUM_LABEL.text = "< DOWN"
-                CC_Y_LABEL.text = "UP >"
-
-                CC_PROX_LABEL.x = COLUMN_B
-                CC_PROX_LABEL.y = ROW_C
-                CC_PROX_NUM_LABEL.text = " "
-                CC_PROX_LABEL.text = " "
-
-                if clue.button_a:
-                    PATCH_HOME = (PATCH_HOME - 1) % PATCH_COUNT
-                    CC_X_LABEL.text = PATCH_HOME
+                print("Mode 2")                
+                if clue.button_a or clue.touch_0:
+                    switch_bank(False)
                     time.sleep(DEBOUNCE_TIME)
-                if clue.button_b:
-                    PATCH_HOME = (PATCH_HOME + 1) % PATCH_COUNT
-                    CC_X_LABEL.text = PATCH_HOME
+                if clue.button_b or clue.touch_1:
+                    switch_bank(True)
                     time.sleep(DEBOUNCE_TIME)
                 if clue.touch_2:
-                    MODE_SETTING = 3
-                    TITLE_LABEL.text = "BiasFX2   M3"
-                    # PATCH_LABEL.text = "Preset {}".format(PATCH_HOME + 1)
-                    CC_PROX_NUM_LABEL.text = "Patch:"
-                    FOOTER_LABEL.text = "   Patches"
-                    CC_Y_NUM_LABEL.x = COLUMN_A
-                    CC_Y_NUM_LABEL.text = " "
-                    CC_Y_LABEL.text = " "
+                    MODE_SETTING = init_mode(3)
                     time.sleep(DEBOUNCE_TOUCH)                    
             elif MODE_SETTING == 3:
                 if clue.button_a:  # or (clue.gesture == 1):
                     do_program_change(0)
-                if clue.button_b:  # or (clue.gesture == 2):
+                elif clue.button_b:  # or (clue.gesture == 2):
                     do_program_change(1)
-                if clue.touch_0:  # or (clue.gesture == 3):
+                elif clue.touch_0:  # or (clue.gesture == 3):
                     do_program_change(2)
-                if clue.touch_1:  # or (clue.gesture == 4):
+                elif clue.touch_1:  # or (clue.gesture == 4):
                     do_program_change(3)
-                if clue.touch_2:
-                    MODE_SETTING = 1
-                    TITLE_LABEL.text = "BiasFX2   M1"
-                    FOOTER_LABEL.text = "        CC"
-                    PICKER_BOX.y = PICKER_BOX_ROW[CC_NUM_PICK_TOGGLE]
+                elif clue.touch_2:
+                    MODE_SETTING = init_mode(1)
                     time.sleep(DEBOUNCE_TOUCH)
         print("Disconnected")
         MODE_SETTING = 0
