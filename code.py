@@ -319,8 +319,7 @@ while True:
         
         while BLE.connected:
             if MODE_SETTING == 1:
-                # Clue sensor readings to CC
-                ACCEL_DATA = clue.acceleration  # get accelerometer reading
+                ACCEL_DATA = clue.acceleration
                 PROX_DATA = clue.proximity
                 ACCEL_X = ACCEL_DATA[0]
                 ACCEL_Y = ACCEL_DATA[1]
@@ -368,29 +367,24 @@ while True:
                     if CC_NUM_PICK_TOGGLE == 0:
                         CC_X_NUM = CC_X_NUM - 1
                         CC_X_NUM_LABEL.text = "CC {}".format(CC_X_NUM)
-                        time.sleep(DEBOUNCE_TIME)
                     elif CC_NUM_PICK_TOGGLE == 1:
                         CC_Y_NUM = CC_Y_NUM - 1
                         CC_Y_NUM_LABEL.text = "CC {}".format(CC_Y_NUM)
-                        time.sleep(DEBOUNCE_TIME)
                     else:
                         CC_PROX_NUM = CC_PROX_NUM - 1
                         CC_PROX_NUM_LABEL.text = "CC {}".format(CC_PROX_NUM)
-                        time.sleep(DEBOUNCE_TIME)
-
+                    time.sleep(DEBOUNCE_TIME)
                 if clue.button_b:
                     if CC_NUM_PICK_TOGGLE == 0:
                         CC_X_NUM = CC_X_NUM + 1
                         CC_X_NUM_LABEL.text = "CC {}".format(CC_X_NUM)
-                        time.sleep(DEBOUNCE_TIME)
                     elif CC_NUM_PICK_TOGGLE == 1:
                         CC_Y_NUM = CC_Y_NUM + 1
                         CC_Y_NUM_LABEL.text = "CC {}".format(CC_Y_NUM)
-                        time.sleep(DEBOUNCE_TIME)
                     else:
                         CC_PROX_NUM = CC_PROX_NUM + 1
                         CC_PROX_NUM_LABEL.text = "CC {}".format(CC_PROX_NUM)
-                        time.sleep(DEBOUNCE_TIME)
+                    time.sleep(DEBOUNCE_TIME)
                 if clue.touch_0:
                     CC_SEND_TOGGLE = not CC_SEND_TOGGLE
                     if CC_SEND_TOGGLE:
@@ -421,7 +415,7 @@ while True:
                     MODE_SETTING = init_mode(3)
                     time.sleep(DEBOUNCE_TOUCH)                    
             elif MODE_SETTING == 3:
-                if clue.button_a:  # or (clue.gesture == 1):
+                if clue.button_a:    # or (clue.gesture == 1):
                     do_program_change(0)
                 elif clue.button_b:  # or (clue.gesture == 2):
                     do_program_change(1)
