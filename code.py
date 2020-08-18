@@ -1,9 +1,7 @@
 """
-CLUE BLE MIDI
+BIAS FX2 CLUE MIDI
 Sends MIDI CC values based on accelerometer x & y and proximity sensor
-Touch #0 switches Bank/Preset patches
-Touch #1 picks among the three CC lines w A&B buttons adjusting CC numbers
-Touch #2 starts/stops sending CC messages (still allows Program Change)
+Switch banks and presets.
 """
 import time
 from adafruit_clue import clue
@@ -189,7 +187,7 @@ TITLE_LABEL.background_color = COLORS["GREEN_DARK"]
 SCREEN.append(TITLE_LABEL)
 
 PATCH_LABEL = label.Label(terminalio.FONT,
-                          text="wating",
+                          text="waiting",
                           scale=2,
                           color=COLORS["BLUE"],
                           max_glyphs=12)
