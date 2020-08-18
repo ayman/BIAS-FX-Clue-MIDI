@@ -22,6 +22,7 @@ import terminalio
 from adafruit_display_text import label
 from adafruit_display_shapes.rect import Rect
 
+DEBUG = False
 
 MIDI_CHANNEL = 1
 MODE_SETTING = 0
@@ -234,16 +235,16 @@ def do_program_change(preset):
     PATCH_PRESET = preset
     MIDI.send(ProgramChange(preset + (PATCH_HOME * 4)))
     CC_PROX_LABEL.text = PRESET_LETTERS[preset]
-    time.sleep(DEBOUNCE_TIME)
+
 
 def debug_loop():
     ACCEL_DATA = clue.acceleration  # get accelerometer reading
     ACCEL_X = ACCEL_DATA[0]
     ACCEL_Y = ACCEL_DATA[1]
-    PROX_DATA = clue.proximity
     print("x:{} y:{}".format(ACCEL_X, ACCEL_Y,))
     print("proximity: {}".format(clue.proximity))
     time.sleep(0.2)
+
 
 def init_mode(mode):
     if mode == 1:
@@ -267,11 +268,11 @@ def init_mode(mode):
         CC_Y_NUM_LABEL.x = COLUMN_A - 15
         CC_Y_NUM_LABEL.text = "< DOWN"
         CC_Y_LABEL.text = "UP >"
-        
+
         CC_PROX_LABEL.x = COLUMN_B
         CC_PROX_LABEL.y = ROW_C
         CC_PROX_NUM_LABEL.text = " "
-        CC_PROX_LABEL.text = " "        
+        CC_PROX_LABEL.text = " "
     elif mode == 3:
         TITLE_LABEL.text = "BiasFX2   M3"
         CC_PROX_NUM_LABEL.text = "Patch:"
@@ -280,32 +281,28 @@ def init_mode(mode):
         CC_Y_NUM_LABEL.text = " "
         CC_Y_LABEL.text = " "
     elif mode == 0:
-        clue.pixel.fill((0, 255, 0))
+        # clue.pixel.fill((0, 255, 0))
         FOOTER_LABEL.x = 120
         FOOTER_LABEL.color = COLORS["BLUE"]
         PATCH_LABEL.text = "Yay..."
-        FOOTER_LABEL.text = "Connected!"        
+        FOOTER_LABEL.text = "Connected!"
     return mode
+
 
 def switch_bank(up):
     global PATCH_HOME, PATCH_COUNT, CC_X_LABEL
     direction = 1 if up is True else -1
-    print(PATCH_HOME)
-    print(PATCH_COUNT)
     PATCH_HOME = (PATCH_HOME + direction) % PATCH_COUNT
     CC_X_LABEL.text = PATCH_HOME
     return PATCH_HOME
-        
 
-# set debug mode True to test raw values, set False to run BLE MIDI
-DEBUG = False
 
 while True:
     if DEBUG:
         debug_loop()
     else:
         print("Waiting for connection")
-        clue.pixel.fill((255, 165, 0))
+        # clue.pixel.fill((255, 165, 0))
         while not BLE.connected:
             pass
         print("Connected")
@@ -314,9 +311,9 @@ while True:
         clue.white_leds = True
         time.sleep(0.5)
         clue.white_leds = False
-        time.sleep(1.0)        
+        time.sleep(1.0)
         MODE_SETTING = init_mode(1)
-        
+
         while BLE.connected:
             if MODE_SETTING == 1:
                 ACCEL_DATA = clue.acceleration
@@ -328,7 +325,7 @@ while True:
                 CC_X = int(simpleio.map_range(ACCEL_X, -9, 9, 0, 127))
 
                 # It's easier to map it inverted for a shoe mount...
-                CC_Y = int(simpleio.map_range(ACCEL_Y, -7, 2, 0, 127))
+                CC_Y = int(simpleio.map_range(ACCEL_Y, -9, 4, 0, 127))
 
                 CC_PROX = int(simpleio.map_range(PROX_DATA, 0, 255, 0, 127))
                 CC_PROX_SWITCH = 127 if CC_PROX > 4 else 0
@@ -346,7 +343,7 @@ while True:
 
                 if CC_PROX_SWITCH != 0:
                     # Since the PROX is a momentary switch, debounce it
-                    time.sleep(DEBOUNCE_TOUCH * 1.5)
+                    time.sleep(DEBOUNCE_TOUCH)
                     clue.white_leds = False
 
                 CC_X_NUM_LABEL.text = "CC {}".format(CC_X_NUM)
@@ -357,11 +354,6 @@ while True:
 
                 CC_PROX_NUM_LABEL.text = "CC {}".format(CC_PROX_NUM)
                 CC_PROX_LABEL.text = CC_PROX
-
-                # If you want to send NoteOn or Pitch Bend, here are examples:
-                # midi.send(NoteOn(44, 1COLUMN_A))  # G sharp 2nd octave
-                # a_pitch_bend = PitchBend(random.randint(0, 16383))
-                # midi.send(a_pitch_bend)
 
                 if clue.button_a:
                     if CC_NUM_PICK_TOGGLE == 0:
@@ -404,7 +396,7 @@ while True:
                     MODE_SETTING = init_mode(2)
                     time.sleep(DEBOUNCE_TOUCH)
             elif MODE_SETTING == 2:
-                print("Mode 2")                
+                print("Mode 2")
                 if clue.button_a or clue.touch_0:
                     switch_bank(False)
                     time.sleep(DEBOUNCE_TIME)
@@ -413,16 +405,20 @@ while True:
                     time.sleep(DEBOUNCE_TIME)
                 if clue.touch_2:
                     MODE_SETTING = init_mode(3)
-                    time.sleep(DEBOUNCE_TOUCH)                    
+                    time.sleep(DEBOUNCE_TOUCH)
             elif MODE_SETTING == 3:
                 if clue.button_a:    # or (clue.gesture == 1):
                     do_program_change(0)
+                    time.sleep(DEBOUNCE_TIME)
                 elif clue.button_b:  # or (clue.gesture == 2):
                     do_program_change(1)
+                    time.sleep(DEBOUNCE_TIME)
                 elif clue.touch_0:  # or (clue.gesture == 3):
                     do_program_change(2)
+                    time.sleep(DEBOUNCE_TOUCH)
                 elif clue.touch_1:  # or (clue.gesture == 4):
                     do_program_change(3)
+                    time.sleep(DEBOUNCE_TOUCH)
                 elif clue.touch_2:
                     MODE_SETTING = init_mode(1)
                     time.sleep(DEBOUNCE_TOUCH)
