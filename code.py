@@ -4,21 +4,21 @@ Sends MIDI CC values based on accelerometer x & y and proximity sensor
 Switch banks and presets.
 """
 import time
-from adafruit_clue import clue
+import simpleio
 import adafruit_ble
-from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
 import adafruit_ble_midi
+from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
+from adafruit_display_shapes.rect import Rect
+import displayio
+import terminalio
+from adafruit_display_text import label
+from adafruit_clue import clue
 import adafruit_midi
 from adafruit_midi.control_change import ControlChange
 from adafruit_midi.program_change import ProgramChange
 
 # from adafruit_midi.note_on import NoteOn
 # from adafruit_midi.pitch_bend import PitchBend
-import simpleio
-import displayio
-import terminalio
-from adafruit_display_text import label
-from adafruit_display_shapes.rect import Rect
 
 DEBUG = False
 
@@ -77,10 +77,9 @@ BG_SPRITE = displayio.TileGrid(COLOR_BITMAP,
                                y=0,
                                pixel_shader=COLOR_PALETTE)
 SCREEN.append(BG_SPRITE)
+
 COLUMN_A = 20
 COLUMN_B = 168
-# positions that are distributed relative to CC_X and CC_PROX y
-# positions
 ROW_A = 80
 ROW_C = 170
 ROW_B = int(ROW_A + ((ROW_C - ROW_A) / 2))
@@ -88,7 +87,6 @@ LINE_ROW_A = int(ROW_A + ((ROW_B - ROW_A) / 2))
 LINE_ROW_B = int(ROW_B + ((ROW_C - ROW_B) / 2))
 PICKER_BOX_ROW = [ROW_A, ROW_B, ROW_C]
 
-# SCREEN boxes
 TITLE_BOX = Rect(0, 0, 240, 60, fill=COLORS["GREEN_DARK"], outline=None)
 SCREEN.append(TITLE_BOX)
 TOP_TRIM_BOX = Rect(0, 54, 240, 8, fill=COLORS["GREEN"], outline=None)
@@ -98,9 +96,7 @@ SCREEN.append(BOTTOM_TRIM_BOX)
 FOOTER_BOX = Rect(0, 203, 240, 50, fill=COLORS["GREEN_DARK"], outline=None)
 SCREEN.append(FOOTER_BOX)
 
-# cc x num
 CC_X_NUM_LABEL = label.Label(terminalio.FONT,
-                             # text=("CC {}".format(CC_X_NUM)),
                              text=(" "),
                              scale=3,
                              color=COLORS["ORANGE"],
@@ -109,7 +105,6 @@ CC_X_NUM_LABEL.x = COLUMN_A
 CC_X_NUM_LABEL.y = ROW_A
 SCREEN.append(CC_X_NUM_LABEL)
 
-# cc x value
 CC_X_LABEL = label.Label(terminalio.FONT,
                          text=(" "),
                          scale=3,
@@ -119,18 +114,14 @@ CC_X_LABEL.x = COLUMN_B
 CC_X_LABEL.y = ROW_A
 SCREEN.append(CC_X_LABEL)
 
-# picker box
 PICKER_BOX = Rect(3, ROW_A, 6, 6, fill=COLORS["ORANGE"], outline=None)
 PICKER_BOX.y = -10
 SCREEN.append(PICKER_BOX)
 
-# mid line
 MID_LINE_A = Rect(0, LINE_ROW_A, 240, 2, fill=COLORS["SILVER"], outline=None)
 SCREEN.append(MID_LINE_A)
 
-# cc y num
 CC_Y_NUM_LABEL = label.Label(terminalio.FONT,
-                             # text=("CC {}".format(CC_Y_NUM)),
                              text=("Connect"),
                              scale=3,
                              color=COLORS["BLUE"],
@@ -139,7 +130,6 @@ CC_Y_NUM_LABEL.x = COLUMN_A
 CC_Y_NUM_LABEL.y = ROW_B
 SCREEN.append(CC_Y_NUM_LABEL)
 
-# cc y value text
 CC_Y_LABEL = label.Label(terminalio.FONT,
                          text=("BLE"),
                          scale=3,
@@ -149,13 +139,10 @@ CC_Y_LABEL.x = COLUMN_B
 CC_Y_LABEL.y = ROW_B
 SCREEN.append(CC_Y_LABEL)
 
-# mid line
 MID_LINE_B = Rect(0, LINE_ROW_B, 240, 2, fill=COLORS["SILVER"], outline=None)
 SCREEN.append(MID_LINE_B)
 
-# cc prox num text
 CC_PROX_NUM_LABEL = label.Label(terminalio.FONT,
-                                # text=("CC {}".format(CC_PROX_NUM)),
                                 text=(" "),
                                 scale=3,
                                 color=COLORS["SILVER"],
@@ -164,9 +151,7 @@ CC_PROX_NUM_LABEL.x = COLUMN_A
 CC_PROX_NUM_LABEL.y = ROW_C
 SCREEN.append(CC_PROX_NUM_LABEL)
 
-# cc prox value text
 CC_PROX_LABEL = label.Label(terminalio.FONT,
-                            # text=CC_PROX,
                             text=(" "),
                             scale=3,
                             color=COLORS["SILVER"],
@@ -236,15 +221,19 @@ def do_program_change(preset):
 
 
 def debug_loop():
-    ACCEL_DATA = clue.acceleration  # get accelerometer reading
-    ACCEL_X = ACCEL_DATA[0]
-    ACCEL_Y = ACCEL_DATA[1]
-    print("x:{} y:{}".format(ACCEL_X, ACCEL_Y,))
+    """Simply print some debug info.
+    """
+    accel = clue.acceleration  # get accelerometer reading
+    accel_x = accel[0]
+    accel_y = accel[1]
+    print("x:{} y:{}".format(accel_x, accel_y,))
     print("proximity: {}".format(clue.proximity))
     time.sleep(0.2)
 
 
 def init_mode(mode):
+    """Set the device for a given mode.
+    """
     if mode == 1:
         TITLE_LABEL.text = "BiasFX2   M1"
         PATCH_LABEL.text = "Mode"
@@ -287,9 +276,11 @@ def init_mode(mode):
     return mode
 
 
-def switch_bank(up):
+def switch_bank(switch_up):
+    """Move bank number up or down (internally, doesn't send CC data).
+    """
     global PATCH_HOME, PATCH_COUNT, CC_X_LABEL
-    direction = 1 if up is True else -1
+    direction = 1 if switch_up is True else -1
     PATCH_HOME = (PATCH_HOME + direction) % PATCH_COUNT
     CC_X_LABEL.text = PATCH_HOME
     return PATCH_HOME
@@ -304,7 +295,6 @@ while True:
         while not BLE.connected:
             pass
         print("Connected")
-        # MODE_SETTING = 1
         init_mode(0)
         clue.white_leds = True
         time.sleep(0.5)
@@ -323,7 +313,7 @@ while True:
                 CC_X = int(simpleio.map_range(ACCEL_X, -9, 9, 0, 127))
 
                 # It's easier to map it inverted for a shoe mount...
-                CC_Y = int(simpleio.map_range(ACCEL_Y, -9, 4, 0, 127))
+                CC_Y = int(simpleio.map_range(ACCEL_Y, -9, 9, 0, 127))
 
                 CC_PROX = int(simpleio.map_range(PROX_DATA, 0, 255, 0, 127))
                 CC_PROX_SWITCH = 127 if CC_PROX > 4 else 0
