@@ -128,3 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 code.py~
+Scratch.md
