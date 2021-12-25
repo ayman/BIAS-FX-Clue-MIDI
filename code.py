@@ -61,15 +61,16 @@ class Debouncer:
         self.timeout = t
         for i in items:
             self.buttons[i] = stamp
+        print(self.buttons)
 
-    def hot(self, button, press=True):
+    def hot(self, button, check=False):
         stamp = time.monotonic()
+        result = True
         if stamp - self.buttons[button] > self.timeout:
-            if press:
-                self.buttons[button] = stamp
-            return False
-        self.buttons[button] = stamp
-        return True
+            result = False
+        if not check:
+            self.buttons[button] = stamp
+        return result
 
 
 class DisplayManager:
@@ -269,7 +270,7 @@ while True:
                 clue_display.starting_patch + 4, cc_x))
             # It's easier to map it inverted for a shoe mount...
             # CC_Y = int(simpleio.map_range(ACCEL_Y, -9, 9, 0, 127))
-            if clue.white_leds:
+            if clue.white_leds and debouncer.hot(BUTTONS["PROXY"], check=True):
                 clue.white_leds = False
             CC_PROX = int(simpleio.map_range(clue.proximity, 0, 255, 0, 127))
             CC_PROX_SWITCH = 127 if CC_PROX > 4 else 0
@@ -294,7 +295,6 @@ while True:
                     midi_data.append(midi_cc)
             if len(midi_data) > 0:
                 MIDI.send(midi_data)
-            time.sleep(0.01)
 
         if clue_display.current_screen == 1:
             if CC_PROX_SWITCH != 0:
@@ -306,18 +306,16 @@ while True:
                 if not debouncer.hot(BUTTONS["CC_MINUS"]):
                     print("Touch: -")
                     clue_display.cc_dec()
-                    time.sleep(DEBOUNCE_DELAY)
             if clue.touch_1:
                 if not debouncer.hot(BUTTONS["CC_PLUS"]):
                     print("Touch: +")
                     clue_display.cc_inc()
-                    time.sleep(DEBOUNCE_DELAY)
             if clue.touch_2:
                 if not debouncer.hot(BUTTONS["CALIBRATE"]):
                     print("Touch: *")
                     START_RANGE = int(
                         simpleio.map_range(ACCEL_X, -9, 9, 0, 127))
-                    time.sleep(DEBOUNCE_DELAY)
+        time.sleep(0.05)
     print("Disconnected")
     clue_display.init_screen()
     BLE.start_advertising(BLE_AD)
